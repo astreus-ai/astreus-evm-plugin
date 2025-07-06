@@ -102,7 +102,7 @@ export class EVMClient {
             path
           ).connect(provider);
           
-          this.wallets.set(wallet.address, wallet);
+          this.wallets.set(wallet.address, wallet as unknown as ethers.Wallet);
           logger.debug("EVM Client", "HD Wallet", `Initialized HD wallet ${i}: ${wallet.address} (${path})`);
         }
       } catch (error) {
@@ -231,7 +231,7 @@ export class EVMClient {
       chainId: Number(txResponse.chainId),
       blockNumber: receipt?.blockNumber,
       blockHash: receipt?.blockHash,
-      status: receipt?.status
+      status: receipt?.status ?? undefined
     };
   }
 
@@ -299,7 +299,7 @@ export class EVMClient {
       gasLimit: block.gasLimit.toString(),
       gasUsed: block.gasUsed.toString(),
       baseFeePerGas: block.baseFeePerGas?.toString(),
-      transactions: block.transactions
+      transactions: [...block.transactions]
     };
   }
 
@@ -330,7 +330,7 @@ export class EVMClient {
       chainId: Number(tx.chainId),
       blockNumber: receipt?.blockNumber,
       blockHash: receipt?.blockHash,
-      status: receipt?.status
+      status: receipt?.status ?? undefined
     };
   }
 
@@ -343,7 +343,7 @@ export class EVMClient {
     
     return logs.map(log => ({
       address: log.address,
-      topics: log.topics,
+      topics: [...log.topics],
       data: log.data,
       blockNumber: log.blockNumber,
       transactionHash: log.transactionHash,
@@ -360,7 +360,7 @@ export class EVMClient {
     const provider = this.getProvider();
     
     const address = await provider.resolveName(name);
-    const resolver = await provider.getResolver(name);
+    const resolver = await (provider as any).getResolver?.(name);
     
     const info: ENSInfo = {
       name,
@@ -391,12 +391,12 @@ export class EVMClient {
     const provider = this.getProvider();
     const connectedWallet = wallet.connect(provider);
     
-    this.wallets.set(wallet.address, connectedWallet);
+    this.wallets.set(wallet.address, connectedWallet as unknown as ethers.Wallet);
     
     return {
       address: wallet.address,
       privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey,
+      publicKey: (wallet as any).publicKey,
       mnemonic: wallet.mnemonic?.phrase
     };
   }
@@ -413,7 +413,7 @@ export class EVMClient {
     return {
       address: wallet.address,
       privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey
+      publicKey: (wallet as any).publicKey
     };
   }
 

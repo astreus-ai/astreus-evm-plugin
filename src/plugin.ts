@@ -565,6 +565,20 @@ export class EVMPlugin implements PluginInstance {
   }
 
   /**
+   * Check if a tool exists
+   */
+  hasTool(name: string): boolean {
+    return this.tools.has(name);
+  }
+
+  /**
+   * Get the number of registered tools
+   */
+  getToolCount(): number {
+    return this.tools.size;
+  }
+
+  /**
    * Tool implementation methods
    */
   
